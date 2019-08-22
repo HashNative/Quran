@@ -1,4 +1,3 @@
-
 inputSuraNumber = input("Input Sura Number:")
 inputSuraName = input("Input Sura Name:")
 inputChapterNumber = input("Input Chapter Number:")
