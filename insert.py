@@ -1,29 +1,35 @@
 import mysql.connector
+import json
 
-mydb = mysql.connector.connect(
+db = mysql.connector.connect(
   host="localhost",
   user="root",
   passwd="",
   database="quran"
 )
 
-mycursor = mydb.cursor()
+cursor = db.cursor()
 
 inputSuraNumber = input("Input Sura Number:")
 inputSuraName = input("Input Sura Name:")
 inputChapterNumber = input("Input Chapter Number:")
 inputSentenceNumber = input("Input Sentence Number:")
 inputSentence = input("Input sentence: ")
+
+word_order = []
 for i in range(0, len(inputSentence.split(" "))):
     inputMeaning = input(str(i)+". Meaning for "+inputSentence.split(" ")[i]+":")
     inputrootWord = input("      Input root word:")
 
+    sql = "INSERT INTO words (word, meaning, root_word) VALUES (%s, %s, %s )"
+    val = (inputSentence.split(" ")[i], inputMeaning, inputrootWord)
+    cursor.execute(sql, val)
+    db.commit()
+    print(cursor.rowcount, "senrence inserted.")
+    word_order.append(cursor.lastrowid)
 
-    sql = "INSERT INTO begin1 (sura_number, sura_name, chapter_number, sentence_number, sentence, word, root_word) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-    val = (inputSuraNumber, inputSuraName, inputChapterNumber, inputSentenceNumber, inputSentence, inputMeaning, inputrootWord)
-
-    mycursor.execute(sql, val)
-
-    mydb.commit()
-
-    print(mycursor.rowcount, "record inserted.")
+sql = "INSERT INTO sentences (sura_no, sura_name, chapter_no, sentence_no, word_order) VALUES (%s,%s,%s,%s,%s)"
+val = (inputSuraNumber, inputSuraName, inputChapterNumber, inputSentenceNumber, json.dumps(word_order))
+cursor.execute(sql, val)
+db.commit()
+print(cursor.rowcount, "record inserted.")
